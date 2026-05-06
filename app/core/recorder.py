@@ -1,25 +1,27 @@
-from datetime import datetime
 import subprocess
+import logging
+import sys
+from utils import camConf
 
 AVAILABLE_FILE_EXT = ['ts']
 
 class RTSPRecorder:
-    def __init__(self, cam_name: str, cam_ipv4: str, cam_port: int = 554, cam_path: str = '', cam_username: str = '', cam_password: str = '',
-                 output_file_dir: str = '/var/log/CCTV_monitoring/cam_rec_file', interval_sec: int = 3600, file_ext: str = 'ts'):
-        self.cam_name = cam_name
-        self.cam_ipv4 = cam_ipv4
-        self.cam_port = cam_port
-        self.cam_path = cam_path
-        self.cam_username = cam_username
-        self.cam_password = cam_password
-        self.output_file_dir = output_file_dir
-        self.interval_sec = interval_sec
-        self.file_ext = file_ext
+    def __init__(self, camConfObj: camConf, video_path: str):
+        self.cam_name = camConfObj.cam_name
+        self.cam_ipv4 = camConfObj.cam_ip
+        self.cam_port = camConfObj.cam_port
+        self.cam_path = camConfObj.cam_path
+        self.cam_username = camConfObj.username
+        self.cam_password = camConfObj.password
+        self.output_file_dir = video_path
+        self.interval_sec = camConfObj.video_interval_seconds
+        self.file_ext = camConfObj.file_ext
+        self.logger = logging.getLogger()
 
         self.process = None
         self.recording = False
 
-    def __check_input(self):
+    def _check_input(self):
         if (self.file_ext[0] == '.'):
             self.file_ext = self.file_ext[1:]
         if (not (self.file_ext in AVAILABLE_FILE_EXT)):
@@ -28,18 +30,18 @@ class RTSPRecorder:
         if (self.cam_path[0] == '/'):
             self.cam_path = self.cam_path[1:] if len(self.cam_path) > 1 else ''
         
-    def __gen_rtsp_URL(self):
+    def _gen_rtsp_URL(self):
         userinfo = f'{self.cam_username}:{self.cam_password}@' \
                     if (self.cam_username != '' and self.cam_password != '') else ''
         rtsp_URL = f'rtsp://{userinfo}{self.cam_ipv4}:{str(self.cam_port)}/{self.cam_path}'
         return rtsp_URL
-
+    
     def start_recording(self):
         if (self.recording == True):
             return
         
-        self.__check_input()
-        rtsp_URL = self.__gen_rtsp_URL()
+        self._check_input()
+        rtsp_URL = self._gen_rtsp_URL()
 
         cmd = [
             'ffmpeg',
@@ -57,13 +59,14 @@ class RTSPRecorder:
             f'{self.output_file_dir}/{self.cam_name}/%Y%m%d_%H%M%S.{self.file_ext}'
             ]
         
-        self.process = subprocess.Popen(cmd)
+        self.process = subprocess.Popen(cmd, stderr=sys.stderr)
         self.recording = True
-        print(f"Start Recording... (Camera Name: {self.cam_name}, Path: {self.output_file_dir})")
+        self.logger.info(f"Start Recording... (Camera Name: {self.cam_name}, Path: {self.output_file_dir}/{self.cam_name})")
 
     def stop_recording(self):
+        logger = logging.getLogger(__name__)
         if (self.process is not None and self.recording == True):
             self.process.terminate()
             self.process.wait()
             self.recording = False
-            print(f"Stop Recording... (Camera Name: {self.cam_name})")
+            self.logger.info(f"Stop Recording... (Camera Name: {self.cam_name})")
