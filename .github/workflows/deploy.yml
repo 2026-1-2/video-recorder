@@ -1,0 +1,74 @@
+name: CD - Image Build and Deploy
+
+concurrency:
+  group: deploy-${{ github.repository }}
+  cancel-in-progress: false
+
+on:
+  workflow_run:
+    workflows: [ "CI - Checking syntax error (Python)" ]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  package: write
+
+env:
+  REGISTRY: ghcr.io
+  ORG: 2026-1-2
+  IMAGE_NAME: video-recorder
+  CONT_NAME: video-recorder
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Login to ghcr
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $REGISTRY -u ${{ github.actor }} --password-stdin
+
+      - name: Build and push
+        run: |
+          docker build \
+            --build-arg GITHUB_ACTOR=${{ github.actor }} \
+            --build-arg GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }} \
+            -t $REGISTRY/$ORG$IMAGE_NAME:latest \
+            -t $REGISTRY/$ORG/$IMAGE_NAME:$(date +%Y%m%d%H%M%S) \
+            .
+          docker push $REGISTRY/$ORG/$IMAGE_NAME --all-tags
+
+  deploy:
+    needs: build-and-push
+    runs-on: [ 'self-hosted' ]
+    env:
+      TZ: Asia/Seoul
+    steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login $REGISTRY -u ${{ github.actor }} --password-stdin
+          
+      - name: Getting current image name
+        id: current_img
+        run: |
+          CURRENT_IMG=$(docker inspect $CONT_NAME --format='{{.Config.Image}}' 2>/dev/null || echo "")
+          echo "image=$CURRENT_IMG" >> $GITHUB_OUTPUT
+
+      - name: Pulling latest image
+        run: docker pull $REGISTRY/$ORG/$IMAGE_NAME:latest
+
+      - name: Executing container using Docker Compose
+        run: |
+          docker compose \
+          -f /opt/docker/compose/video-recorder-docker-compose.yml \
+          --env-file /opt/docker/env/video-recorder.env \
+          up -d --no-build --pull never \
+          $CONT_NAME
+
+      - name: Removing old image
+        if: success() && steps.current_img.outputs.image != ''
+        run: docker image rm ${{ steps.current_img.outputs.image }} || true
+
+      - name: Flushing docker cache
+        run: docker buildx prune -f

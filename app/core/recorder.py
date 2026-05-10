@@ -64,7 +64,6 @@ class RTSPRecorder:
         self.logger.info(f"Start Recording... (Camera Name: {self.cam_name}, Path: {self.output_file_dir}/{self.cam_name})")
 
     def stop_recording(self):
-        logger = logging.getLogger(__name__)
         if (self.process is not None and self.recording == True):
             self.process.terminate()
             self.process.wait()

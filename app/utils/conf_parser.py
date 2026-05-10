@@ -1,12 +1,28 @@
 import crossplane
 import os
-import glob
 
-def get_conf_data():
+def _get_common_conf_data(): # Parse "recorder.conf"
     base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     main_conf_path = os.path.join(base_path, 'config', 'recorder.conf')
     payload = crossplane.parse(main_conf_path)
     return payload
+
+def getConfigAndCamInfo():
+    using_DB = os.getenv("CAM_INFO_DB_ACTIVATE", "false")
+    payload = _get_common_conf_data()
+    global_conf = {item['directive']: item['args'][0] for item in payload['config'][0]['parsed'][0]['block'] }
+    globalConfObj = globalConf(global_conf)
+    camConfObjList = []
+
+    if (str(using_DB).lower() in ("true", "1", "yes", "y", "on")):
+        ## Get the information of camera from DB.
+        pass
+    else: ## Get the information of camera from disk. (.conf file)
+        for conf in payload['config'][1:]:
+            cam_conf = {item['directive']: item['args'][0] for item in conf['parsed'][0]['block'] }
+            camConfObjList.append(camConf(cam_conf))
+
+    return globalConfObj, camConfObjList
 
 class globalConf:
     def __init__(self, confObj: dict):
