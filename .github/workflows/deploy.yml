@@ -23,8 +23,8 @@ jobs:
       TZ: Asia/Seoul
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@4
-        
+        uses: actions/checkout@v4
+
       - name: Build
         run: |
           docker build \
