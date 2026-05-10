@@ -1,9 +1,16 @@
+import logging
 import crossplane
 import os
+
+logger = logging.getLogger()
 
 def _get_common_conf_data(): # Parse "recorder.conf"
     base_path = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
     main_conf_path = os.path.join(base_path, 'config', 'recorder.conf')
+    if (not os.path.exists(main_conf_path)):
+        logger.error("recorder.conf does not exist.")
+        exit(1)
+    
     payload = crossplane.parse(main_conf_path)
     return payload
 
