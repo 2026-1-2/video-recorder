@@ -3,7 +3,7 @@ import logging
 import sys
 from utils import camConf
 
-AVAILABLE_FILE_EXT = ['ts']
+AVAILABLE_FILE_EXT = ['ts', 'mp4']
 
 class RTSPRecorder:
     def __init__(self, camConfObj: camConf, video_path: str):
@@ -43,6 +43,8 @@ class RTSPRecorder:
         self._check_input()
         rtsp_URL = self._gen_rtsp_URL()
 
+        mp4_opts = ['-segment_format_options', 'movflags=frag_keyframe+empty_moov+default_base_moof'] \
+                   if self.file_ext == 'mp4' else []
         cmd = [
             'ffmpeg',
             '-loglevel', 'error',
@@ -54,7 +56,8 @@ class RTSPRecorder:
             '-c', 'copy',
             '-f', 'segment',
             '-segment_time', str(self.interval_sec),
-            '-segment_format', 'ts',
+            '-segment_format', self.file_ext,
+            *mp4_opts,
             '-strftime', '1',
             f'{self.output_file_dir}/{self.cam_name}/%Y%m%d_%H%M%S.{self.file_ext}'
             ]
