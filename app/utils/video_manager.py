@@ -59,7 +59,7 @@ def storage_manager(video_path: str, low_percent: float, high_percent: float, ex
         ext = [ ".ts" ]
 
     try:
-        if disk_usage_percent(video_path) > high_percent: ## ex. 사용량 80% 초과 (High_percent) -> 여유 공간 50% 확보까지, 오래된 영상부터 삭제 (Low_Percent)
+        if disk_usage_percent(video_path) > high_percent: ## ex. 사용량 90% 초과 (High_percent) -> 여유 공간 40% 확보까지, 오래된 영상부터 삭제 (Low_Percent)
             purge_old_files_until(video_path=video_path, target_percent=low_percent, extensions=ext)
     except Exception:
         logger.exception("Storage Manager Error")
