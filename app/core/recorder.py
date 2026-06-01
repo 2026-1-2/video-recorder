@@ -1,9 +1,8 @@
 import subprocess
 import logging
 import sys
+from main import AVAILABLE_FILE_EXT
 from utils import camConf
-
-global AVAILABLE_FILE_EXT
 
 class RTSPRecorder:
     def __init__(self, camConfObj: camConf, video_path: str):
