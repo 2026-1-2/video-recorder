@@ -4,11 +4,13 @@ import time
 import sys
 import signal
 from core import RTSPRecorder
-from utils import getConfigAndCamInfo, envSetup
+from utils import getConfigAndCamInfo, envSetup, storage_manager
 Recorders = []
 logger = logging.getLogger()
 shutdown_flag = False
 signumVar = -1
+DISK_CHECK_INTERVAL = os.getenv["DISK_CAPACITY_CHECK_INTERVAL", 60]
+AVAILABLE_FILE_EXT = [ext.strip() for ext in os.getenv["AVAILABLE_FILE_EXT", ".ts"].split(",")]
 
 def signal_handler(signum, frame):
     global shutdown_flag
@@ -28,8 +30,14 @@ if __name__ == '__main__':
         recObj.start_recording()
         Recorders.append(recObj)
 
+    last_storage_check = time.time()
     while shutdown_flag == False:
         try:
+            now = time.time()
+            if now - last_storage_check > DISK_CHECK_INTERVAL:
+                last_storage_check = now
+                storage_manager(video_path=globalConfObj.video_path, low_percent=60, high_percent=90, ext=AVAILABLE_FILE_EXT)
+
             for recObj in Recorders:
                 if (shutdown_flag == True):
                     break

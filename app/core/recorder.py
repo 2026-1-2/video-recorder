@@ -3,7 +3,7 @@ import logging
 import sys
 from utils import camConf
 
-AVAILABLE_FILE_EXT = ['ts', 'mp4']
+global AVAILABLE_FILE_EXT
 
 class RTSPRecorder:
     def __init__(self, camConfObj: camConf, video_path: str):
