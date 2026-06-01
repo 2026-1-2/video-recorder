@@ -26,7 +26,7 @@ if __name__ == '__main__':
     signal.signal(signal.SIGTERM, signal_handler)
 
     for camConfObj in camConfObjList:
-        recObj = RTSPRecorder(camConfObj=camConfObj, video_path=globalConfObj.video_path)
+        recObj = RTSPRecorder(camConfObj=camConfObj, video_path=globalConfObj.video_path, ext=AVAILABLE_FILE_EXT)
         recObj.start_recording()
         Recorders.append(recObj)
 

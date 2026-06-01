@@ -1,11 +1,10 @@
 import subprocess
 import logging
 import sys
-from main import AVAILABLE_FILE_EXT
 from utils import camConf
 
 class RTSPRecorder:
-    def __init__(self, camConfObj: camConf, video_path: str):
+    def __init__(self, camConfObj: camConf, video_path: str, ext: list[str] | None = None):
         self.cam_name = camConfObj.cam_name
         self.cam_ipv4 = camConfObj.cam_ip
         self.cam_port = camConfObj.cam_port
@@ -15,15 +14,17 @@ class RTSPRecorder:
         self.output_file_dir = video_path
         self.interval_sec = camConfObj.video_interval_seconds
         self.file_ext = camConfObj.file_ext
+        self.avail_ext_list = ext if ext is not None else [".ts"]
         self.logger = logging.getLogger()
 
         self.process = None
         self.recording = False
 
-    def _check_input(self):
+    def _check_input(self, ):
+        
         if (self.file_ext[0] == '.'):
             self.file_ext = self.file_ext[1:]
-        if (not (self.file_ext in AVAILABLE_FILE_EXT)):
+        if (not (self.file_ext in self.avail_ext_list)):
             raise ValueError(f"Unsupported File Extension: {self.file_ext}")
         
         if (self.cam_path[0] == '/'):
