@@ -51,7 +51,7 @@ rm example.conf
 - VIDEO_RECORDER_CONF_PATH_ROOT: 본 프로그램의 설정 파일 저장 경로 / 입력된 경로는 camera 디렉토리 및 recorder.conf의 상위 디렉토리여야 합니다.
 - VIDEO_RECORDER_VIDEO_PATH_ROOT: 녹화 영상 저장 경로
 - DISK_CAPACITY_CHECK_INTERVAL: 디스크의 여유 공간을 체크할 간격(초) / 입력된 간격마다 여유 공간을 체크합니다. 여유 공간이 10% 미만인 경우, 여유 공간이 40% 이상 확보될 때 까지 가장 오래된 영상을 삭제합니다. (main.py 및 utils/video_manager.py 참조)
-- AVAILABLE_FILE_EXT: 영상 확장자 / 카메라마다 서로 다른 확장자를 사용한다면, 사용되는 모든 확장자를 본 변수에 지정하여야 합니다. (ex. ".mp4, .ts") 별다른 사유가 없다면 .ts 사용을 권장합니다.
+- AVAILABLE_FILE_EXT: 영상 확장자 / 카메라마다 서로 다른 확장자를 사용한다면, 사용되는 모든 확장자를 본 변수에 지정하여야 합니다. (ex. ".mp4, .ts") 별다른 사유가 없다면 .ts 사용을 권장합니다. 반드시 "."을 포함하여 작성해주세요. (ts - X / .ts - O)
 
 ### 4. 컨테이너 실행
 ```
