@@ -9,8 +9,8 @@ Recorders = []
 logger = logging.getLogger()
 shutdown_flag = False
 signumVar = -1
-DISK_CHECK_INTERVAL = os.getenv["DISK_CAPACITY_CHECK_INTERVAL", 60]
-AVAILABLE_FILE_EXT = [ext.strip() for ext in os.getenv["AVAILABLE_FILE_EXT", ".ts"].split(",")]
+DISK_CHECK_INTERVAL = os.getenv("DISK_CAPACITY_CHECK_INTERVAL", 60)
+AVAILABLE_FILE_EXT = [ext.strip() for ext in os.getenv("AVAILABLE_FILE_EXT", ".ts").split(",")]
 
 def signal_handler(signum, frame):
     global shutdown_flag
