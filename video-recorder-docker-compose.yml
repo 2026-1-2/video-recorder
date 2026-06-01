@@ -5,7 +5,8 @@ services:
     restart: unless-stopped
     environment:
       - TZ=Asia/Seoul
-      - CAM_INFO_DB_ACTIVATE=${CAM_INFO_DB_ACTIVATE}
+      - DISK_CAPACITY_CHECK_INTERVAL=${DISK_CAPACITY_CHECK_INTERVAL}
+      - AVAILABLE_FILE_EXT=${AVAILABLE_FILE_EXT}
     volumes:
       - "${VIDEO_RECORDER_LOG_PATH_ROOT}:/recorder/logs"
       - "${VIDEO_RECORDER_CONF_PATH_ROOT}:/recorder/config:ro"
