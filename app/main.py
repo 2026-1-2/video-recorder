@@ -9,7 +9,7 @@ Recorders = []
 logger = logging.getLogger()
 shutdown_flag = False
 signumVar = -1
-DISK_CHECK_INTERVAL = os.getenv("DISK_CAPACITY_CHECK_INTERVAL", 60)
+DISK_CHECK_INTERVAL = int(os.getenv("DISK_CAPACITY_CHECK_INTERVAL", 60))
 AVAILABLE_FILE_EXT = [ext.strip() for ext in os.getenv("AVAILABLE_FILE_EXT", ".ts").split(",")]
 
 def signal_handler(signum, frame):
@@ -36,7 +36,7 @@ if __name__ == '__main__':
             now = time.time()
             if now - last_storage_check > DISK_CHECK_INTERVAL:
                 last_storage_check = now
-                storage_manager(video_path=globalConfObj.video_path, low_percent=60, high_percent=90, ext=AVAILABLE_FILE_EXT)
+                storage_manager(video_path=globalConfObj.video_path, low_percent=60.0, high_percent=90.0, ext=AVAILABLE_FILE_EXT)
 
             for recObj in Recorders:
                 if (shutdown_flag == True):
