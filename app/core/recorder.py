@@ -20,10 +20,7 @@ class RTSPRecorder:
         self.process = None
         self.recording = False
 
-    def _check_input(self, ):
-        
-        if (self.file_ext[0] == '.'):
-            self.file_ext = self.file_ext[1:]
+    def _check_input(self):
         if (not (self.file_ext in self.avail_ext_list)):
             raise ValueError(f"Unsupported File Extension: {self.file_ext}")
         
